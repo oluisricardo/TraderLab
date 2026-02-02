@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-3">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradeLab - Dashboard de Trading Completo</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1><i class="fas fa-chart-line"></i> TraderLab</span></h1>
+                <p class="version">v1.0</p>
+            </div>
+            
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <h3>Profile</h3>
+                    <p>Conta Demo</p>
+                </div>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <h4>PRINCIPAL</h4>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="trades">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Operações</span>
+                        <span class="badge" id="trades-count">0</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="journals">
+                        <i class="fas fa-book"></i>
+                        <span>Diários</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>ANÁLISE</h4>
+                    <a href="#" class="nav-item" data-page="metrics">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Métricas</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="performance">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Performance</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="statistics">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Estatísticas</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>RELATÓRIOS</h4>
+                    <a href="#" class="nav-item" data-page="daily">
+                        <i class="fas fa-calendar-day"></i>
+                        <span>Diário</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="weekly">
+                        <i class="fas fa-calendar-week"></i>
+                        <span>Semanal</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="monthly">
+                        <i class="fas fa-calendar"></i>
+                        <span>Mensal</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>CONFIGURAÇÃO</h4>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="import">
+                        <i class="fas fa-file-import"></i>
+                        <span>Importar Dados</span>
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="storage-info">
+                    <div class="storage-bar">
+                        <div class="storage-fill" style="width: 45%"></div>
+                    </div>
+                    <p>45% usado</p>
+                </div>
+                <button class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 id="page-title">Dashboard</h2>
+                </div>
+                
+                <div class="header-right">
+                    <div class="date-selector">
+                        <button class="date-btn" id="prev-date">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="current-date" id="current-date">Fevereiro 2024</div>
+                        <button class="date-btn" id="next-date">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <select id="period-select">
+                            <option value="monthly">Mensal</option>
+                            <option value="weekly">Semanal</option>
+                            <option value="daily">Diário</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="header-actions">
+                        <button class="btn-icon" id="refresh-btn" title="Atualizar dados">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="btn-icon" id="export-btn" title="Exportar dados">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="btn-primary" id="add-trade-btn">
+                            <i class="fas fa-plus"></i>
+                            Nova Operação
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content Pages -->
+            <div class="content-pages">
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboard-page">
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="card-header">
+                                <h3>Lucro/Prejuízo Total</h3>
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="card-value" id="total-pl">R$ 0,00</div>
+                            <div class="card-trend" id="pl-trend">
+                                <span class="trend-text">Carregando...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="card-header">
+                                <h3>Taxa de Acerto</h3>
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="card-value" id="win-rate">0%</div>
+                            <div class="card-trend" id="winrate-trend">
+                                <span class="trend-text">Carregando...</span>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="card-header">
+                                <h3>Operações</h3>
+                                <i class="fas fa-exchange-alt"></i>
+                            </div>
+                            <div class="card-value" id="total-trades">0</div>
+                            <div class="card-trend">
+                                <span class="trend-text">
+                                    <span id="win-trades">0</span> Win / 
+                                    <span id="loss-trades">0</span> Loss
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <div class="card-header">
+                                <h3>Risk/Reward Médio</h3>
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="card-value" id="avg-rr">0.00</div>
+                            <div class="card-trend">
+                                <span class="trend-text">Expectativa Positiva</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div class="charts-row">
+                        <div class="chart-container large">
+                            <div class="chart-header">
+                                <h3>Performance Mensal</h3>
+                                <div class="chart-actions">
+                                    <select class="chart-select" id="chart-period">
+                                        <option value="7d">7 dias</option>
+                                        <option value="30d" selected>30 dias</option>
+                                        <option value="90d">90 dias</option>
+                                        <option value="1y">1 ano</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-body">
+                                <div id="performance-chart"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3>Distribuição de Resultados</h3>
+                            </div>
+                            <div class="chart-body">
+                                <canvas id="distribution-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Trades & Stats -->
+                    <div class="dashboard-bottom">
+                        <div class="recent-trades">
+                            <div class="section-header">
+                                <h3>Operações Recentes</h3>
+                                <a href="#" class="view-all" data-page="trades">Ver todas</a>
+                            </div>
+                            <div class="table-container">
+                                <table id="recent-trades-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Ativo</th>
+                                            <th>Direção</th>
+                                            <th>Entrada</th>
+                                            <th>Saída</th>
+                                            <th>Resultado</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-trades-body">
+                                        <!-- Trades will be loaded here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-stats">
+                            <div class="stat-card">
+                                <h4>Melhor Operação</h4>
+                                <div class="stat-value positive" id="best-trade">R$ 0,00</div>
+                                <p class="stat-detail" id="best-trade-detail">-</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Pior Operação</h4>
+                                <div class="stat-value negative" id="worst-trade">R$ 0,00</div>
+                                <p class="stat-detail" id="worst-trade-detail">-</p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Sequência Win</h4>
+                                <div class="stat-value" id="win-streak">0</div>
+                                <p class="stat-detail">Máximo: <span id="max-win-streak">0</span></p>
+                            </div>
+                            <div class="stat-card">
+                                <h4>Sequência Loss</h4>
+                                <div class="stat-value" id="loss-streak">0</div>
+                                <p class="stat-detail">Máximo: <span id="max-loss-streak">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Trades Page -->
+                <div class="page" id="trades-page">
+                    <div class="page-header">
+                        <h2>Todas as Operações</h2>
+                        <div class="page-actions">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="trade-search" placeholder="Buscar operações...">
+                            </div>
+                            <select id="trade-filter">
+                                <option value="all">Todas</option>
+                                <option value="win">Win</option>
+                                <option value="loss">Loss</option>
+                                <option value="this-month">Este mês</option>
+                                <option value="last-month">Mês anterior</option>
+                            </select>
+                            <button class="btn-secondary" id="bulk-actions-btn">
+                                <i class="fas fa-tasks"></i>
+                                Ações em Massa
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container full">
+                        <table id="all-trades-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="select-all-trades"></th>
+                                    <th>Data <i class="fas fa-sort"></i></th>
+                                    <th>Ativo <i class="fas fa-sort"></i></th>
+                                    <th>Setup</th>
+                                    <th>Direção</th>
+                                    <th>Entrada</th>
+                                    <th>Saída</th>
+                                    <th>Stop</th>
+                                    <th>Alvo</th>
+                                    <th>Resultado <i class="fas fa-sort"></i></th>
+                                    <th>RR</th>
+                                    <th>Diário</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-trades-body">
+                                <!-- All trades will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination">
+                        <button class="pagination-btn" id="prev-page" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="page-info">Página <span id="current-page">1</span> de <span id="total-pages">1</span></span>
+                        <button class="pagination-btn" id="next-page" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <select id="page-size">
+                            <option value="10">10 por página</option>
+                            <option value="25" selected>25 por página</option>
+                            <option value="50">50 por página</option>
+                            <option value="100">100 por página</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Metrics Page -->
+                <div class="page" id="metrics-page">
+                    <div class="page-header">
+                        <h2>Métricas Detalhadas</h2>
+                        <div class="metrics-period">
+                            <select id="metrics-period">
+                                <option value="all">Todo período</option>
+                                <option value="year">Este ano</option>
+                                <option value="month" selected>Este mês</option>
+                                <option value="week">Esta semana</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="metrics-grid">
+                        <div class="metric-card large">
+                            <h3>Evolução do Patrimônio</h3>
+                            <div id="equity-chart"></div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Distribuição por Horário</h3>
+                            <div id="time-distribution-chart"></div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Performance por Setup</h3>
+                            <div id="setup-performance-chart"></div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Risco por Operação</h3>
+                            <div class="risk-metrics">
+                                <div class="risk-item">
+                                    <span>Maior risco tomado</span>
+                                    <span class="risk-value negative">-2.5%</span>
+                                </div>
+                                <div class="risk-item">
+                                    <span>Risco médio</span>
+                                    <span class="risk-value">-0.8%</span>
+                                </div>
+                                <div class="risk-item">
+                                    <span>Menor risco</span>
+                                    <span class="risk-value positive">-0.2%</span>
+                                </div>
+                                <div class="risk-item">
+                                    <span>Expectativa matemática</span>
+                                    <span class="risk-value positive">+0.4%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Estatísticas Avançadas</h3>
+                            <div class="advanced-stats">
+                                <div class="stat-item">
+                                    <span>Sharpe Ratio</span>
+                                    <span class="stat-value">1.24</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Sortino Ratio</span>
+                                    <span class="stat-value">1.87</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Max Drawdown</span>
+                                    <span class="stat-value negative">-8.2%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Recovery Factor</span>
+                                    <span class="stat-value">2.45</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span>Profit Factor</span>
+                                    <span class="stat-value">1.67</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-card">
+                            <h3>Consistência</h3>
+                            <div class="consistency-metrics">
+                                <div class="consistency-item">
+                                    <div class="consistency-bar">
+                                        <div class="consistency-fill" style="width: 75%"></div>
+                                    </div>
+                                    <span>Mensal: 75%</span>
+                                </div>
+                                <div class="consistency-item">
+                                    <div class="consistency-bar">
+                                        <div class="consistency-fill" style="width: 68%"></div>
+                                    </div>
+                                    <span>Semanal: 68%</span>
+                                </div>
+                                <div class="consistency-item">
+                                    <div class="consistency-bar">
+                                        <div class="consistency-fill" style="width: 82%"></div>
+                                    </div>
+                                    <span>Diária: 82%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Journals Page -->
+                <div class="page" id="journals-page">
+                    <div class="page-header">
+                        <h2>Diários de Trading</h2>
+                        <button class="btn-primary" id="add-journal-btn">
+                            <i class="fas fa-plus"></i>
+                            Novo Diário
+                        </button>
+                    </div>
+                    
+                    <div class="journals-container">
+                        <div class="journal-sidebar">
+                            <div class="journal-list" id="journal-list">
+                                <!-- Journals will be loaded here -->
+                            </div>
+                        </div>
+                        
+                        <div class="journal-content">
+                            <div class="journal-editor" id="journal-editor">
+                                <div class="editor-placeholder">
+                                    <i class="fas fa-book-open"></i>
+                                    <h3>Selecione um diário ou crie um novo</h3>
+                                    <p>Registre suas observações, lições aprendidas e planos para as próximas operações.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Page -->
+                <div class="page" id="settings-page">
+                    <div class="page-header">
+                        <h2>Configurações</h2>
+                    </div>
+                    
+                    <div class="settings-container">
+                        <div class="settings-sidebar">
+                            <div class="settings-nav">
+                                <a href="#" class="settings-nav-item active" data-setting="general">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>Geral</span>
+                                </a>
+                                <a href="#" class="settings-nav-item" data-setting="account">
+                                    <i class="fas fa-user"></i>
+                                    <span>Conta</span>
+                                </a>
+                                <a href="#" class="settings-nav-item" data-setting="notifications">
+                                    <i class="fas fa-bell"></i>
+                                    <span>Notificações</span>
+                                </a>
+                                <a href="#" class="settings-nav-item" data-setting="import-export">
+                                    <i class="fas fa-file-export"></i>
+                                    <span>Importar/Exportar</span>
+                                </a>
+                                <a href="#" class="settings-nav-item" data-setting="backup">
+                                    <i class="fas fa-database"></i>
+                                    <span>Backup</span>
+                                </a>
+                                <a href="#" class="settings-nav-item" data-setting="about">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>Sobre</span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-content">
+                            <div class="settings-section active" id="general-settings">
+                                <h3>Configurações Gerais</h3>
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label for="currency">Moeda</label>
+                                        <select id="currency">
+                                            <option value="BRL">Real (R$)</option>
+                                            <option value="USD">Dólar ($)</option>
+                                            <option value="EUR">Euro (€)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="timezone">Fuso Horário</label>
+                                        <select id="timezone">
+                                            <option value="America/Sao_Paulo" selected>Brasília (GMT-3)</option>
+                                            <option value="UTC">UTC</option>
+                                            <option value="America/New_York">Nova York (GMT-5)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="theme">Tema</label>
+                                        <select id="theme">
+                                            <option value="light">Claro</option>
+                                            <option value="dark" selected>Escuro</option>
+                                            <option value="auto">Automático</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="auto-save" checked>
+                                            Salvar automaticamente
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="email-reports">
+                                            Enviar relatórios por e-mail
+                                        </label>
+                                    </div>
+                                    
+                                    <button class="btn-primary" id="save-settings">
+                                        Salvar Configurações
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Other settings sections would go here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-left">
+                    <p>TradeMaster v1.0 • <span id="last-update">Última atualização: Hoje 10:30</span></p>
+                </div>
+                <div class="footer-right">
+                    <p id="trade-count">Total de operações: <span>0</span></p>
+                    <p id="data-size">Tamanho dos dados: <span>0 KB</span></p>
+                </div>
+            </footer>
+        </main>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="add-trade-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Adicionar Nova Operação</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="trade-form">
+                <div class="form-tabs">
+                    <button type="button" class="form-tab active" data-tab="basic">Básico</button>
+                    <button type="button" class="form-tab" data-tab="advanced">Avançado</button>
+                    <button type="button" class="form-tab" data-tab="notes">Notas</button>
+                </div>
+                
+                <div class="form-tab-content active" id="basic-tab">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="trade-date">Data da Operação *</label>
+                            <input type="datetime-local" id="trade-date" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="asset">Ativo *</label>
+                            <input type="text" id="asset" placeholder="Ex: PETR4, WDOFUT" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="direction">Direção *</label>
+                            <select id="direction" required>
+                                <option value="buy">Compra</option>
+                                <option value="sell">Venda</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="setup">Setup</label>
+                            <select id="setup">
+                                <option value="">Selecione</option>
+                                <option value="rompimento">Rompimento</option>
+                                <option value="pullback">Pullback</option>
+                                <option value="reversao">Reversão</option>
+                                <option value="lateralidade">Lateralidade</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="entry-price">Preço de Entrada *</label>
+                            <input type="number" step="0.01" id="entry-price" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="exit-price">Preço de Saída *</label>
+                            <input type="number" step="0.01" id="exit-price" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">Quantidade *</label>
+                            <input type="number" id="quantity" value="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="result">Resultado</label>
+                            <input type="text" id="result" readonly>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-tab-content" id="advanced-tab">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="stop-loss">Stop Loss</label>
+                            <input type="number" step="0.01" id="stop-loss">
+                        </div>
+                        <div class="form-group">
+                            <label for="take-profit">Take Profit</label>
+                            <input type="number" step="0.01" id="take-profit">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="risk-percent">Risco %</label>
+                            <input type="number" step="0.01" id="risk-percent">
+                        </div>
+                        <div class="form-group">
+                            <label for="reward-risk">Reward/Risk</label>
+                            <input type="number" step="0.01" id="reward-risk" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="commission">Comissão/Corretagem</label>
+                            <input type="number" step="0.01" id="commission" value="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="fees">Taxas</label>
+                            <input type="number" step="0.01" id="fees" value="0.00">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-tab-content" id="notes-tab">
+                    <div class="form-group">
+                        <label for="trade-notes">Notas da Operação</label>
+                        <textarea id="trade-notes" rows="6" placeholder="Registre suas observações, emoções, lições aprendidas..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="screenshot">Screenshot/Print</label>
+                        <input type="file" id="screenshot" accept="image/*">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="review-later">
+                            Revisar mais tarde
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary close-modal">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar Operação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Importar Dados</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="import-options">
+                    <div class="import-option">
+                        <i class="fas fa-file-excel"></i>
+                        <h4>Planilha Excel/CSV</h4>
+                        <p>Importe dados de uma planilha existente</p>
+                        <input type="file" id="excel-file" accept=".csv,.xlsx,.xls" style="display: none;">
+                        <button class="btn-secondary" id="browse-excel">Selecionar Arquivo</button>
+                    </div>
+                    
+                    <div class="import-option">
+                        <i class="fas fa-exchange-alt"></i>
+                        <h4>Plataformas de Trading</h4>
+                        <p>Importe histórico da sua corretora</p>
+                        <select id="broker-select">
+                            <option value="">Selecione a corretora</option>
+                            <option value="xp">XP Investimentos</option>
+                            <option value="rico">Rico</option>
+                            <option value="clear">Clear</option>
+                            <option value="mt5">MetaTrader 5</option>
+                        </select>
+                    </div>
+                    
+                    <div class="import-option">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h4>Backup</h4>
+                        <p>Restaurar de um backup anterior</p>
+                        <input type="file" id="backup-file" accept=".json" style="display: none;">
+                        <button class="btn-secondary" id="browse-backup">Selecionar Backup</button>
+                    </div>
+                </div>
+                
+                <div class="import-preview" id="import-preview" style="display: none;">
+                    <h4>Pré-visualização dos dados</h4>
+                    <div class="preview-table" id="preview-table"></div>
+                    <div class="import-actions">
+                        <button class="btn-secondary" id="cancel-import">Cancelar</button>
+                        <button class="btn-primary" id="confirm-import">Confirmar Importação</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Carregando dados...</p>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
